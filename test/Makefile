@@ -6,7 +6,7 @@ SIM ?= icarus
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = project.v
+PROJECT_SOURCES = tt_um_protocolemu_dailingw.sv fifo.sv
 
 ifneq ($(GATES),yes)
 
@@ -41,3 +41,9 @@ COCOTB_TEST_MODULES = test
 
 # include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim
+
+.PHONY: fifo-test
+fifo-test:
+	mkdir -p sim_build/fifo
+	iverilog -g2012 -s fifo_tb -o sim_build/fifo/sim.vvp $(SRC_DIR)/fifo.sv fifo_tb.sv
+	vvp sim_build/fifo/sim.vvp

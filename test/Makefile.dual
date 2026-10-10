@@ -1,0 +1,14 @@
+# Separate RTL-only runner; the existing `make` still runs test.py.
+SIM ?= icarus
+FST ?= -fst
+TOPLEVEL_LANG = verilog
+
+VERILOG_SOURCES = $(abspath ../src/tt_um_protocolemu_dailingw.sv) \
+                  $(abspath ../src/fifo.sv) \
+                  $(abspath tb_dual.sv)
+TOPLEVEL = tb_dual
+COCOTB_TEST_MODULES = test_dual
+SIM_BUILD = sim_build/dual
+COCOTB_RESULTS_FILE = results_dual.xml
+
+include $(shell cocotb-config --makefiles)/Makefile.sim

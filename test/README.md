@@ -1,12 +1,60 @@
-# Sample testbench for a Tiny Tapeout project
+# UART testbenches
 
-This is a sample testbench for a Tiny Tapeout project. It uses [cocotb](https://docs.cocotb.org/en/stable/) to drive the DUT and check the outputs.
-See below to get started or for more information, check the [website](https://tinytapeout.com/hdl/testing/).
+Cocotb is Python code running alongside an HDL simulator. The simulator executes
+the SystemVerilog; Python drives inputs, waits for simulated events, and checks
+outputs. These benches use [Cocotb](https://docs.cocotb.org/en/stable/).
 
-## Setting up
+## How the existing test works
 
-1. Edit [Makefile](Makefile) and modify `PROJECT_SOURCES` to point to your Verilog files.
-2. Edit [tb.v](tb.v) and replace `tt_um_example` with your module name.
+- `tb.v` instantiates one UART and exposes its ports to Python as `dut`.
+- `@cocotb.test()` registers an `async def` function as a test.
+- `Clock(...).start()` generates the clock in a background coroutine.
+- `signal.value = ...` drives a signal; `int(signal.value)` reads it.
+- `await ClockCycles(...)` waits for clock edges; `await Timer(...)` waits for
+  simulation time. An `await` lets the simulator and other coroutines advance.
+- `tick()` waits for an edge and then 1 ns so the HDL's `<=` updates have settled.
+- `transmit()` offers a parallel byte and checks the outgoing serial frame.
+  In `for expected_bit in frame`, the outer loop visits start, eight data bits,
+  and stop. The inner loop checks that bit throughout its 104 system clocks.
+- `receive()` acts as an independent external serial transmitter. `take()`
+  accepts a queued parallel byte by asserting RX_READY for one rising edge.
+- `cocotb.start_soon(...)` runs an operation concurrently; ordinary `await helper()`
+  waits for that helper to finish before continuing.
+- An `assert` mismatch fails the test. Timeout limits catch missing handshakes.
+
+## Two-UART learning scaffold
+
+The additional files are independent of the existing single-UART tests:
+
+- `tb_dual.sv`: two UART instances on a shared clock/reset, with A.TX connected
+  to B.RX and B.TX connected to A.RX. Named parallel signals hide the pin masks.
+- `test_dual.py`: reset, bounded handshake helpers, and one byte sent each way.
+  The TODOs are exercises for you to implement.
+- `Makefile.dual`: a separate RTL-only simulator build and results file.
+
+Run from this directory:
+
+```sh
+make -f Makefile.dual
+```
+
+The waveform is `tb_dual.fst`; results are in `results_dual.xml`.
+In this bench, Python drives only the parallel interfaces. The actual DUTs
+generate and decode the serial frames:
+
+```text
+Python -> A parallel TX -> A UART TX -> B UART RX -> B FIFO -> Python
+Python <- A FIFO <- A UART RX <- B UART TX <- B parallel TX <- Python
+```
+
+Start with a sequence in one direction, then test simultaneous traffic. Keep
+RX_READY low while waiting for RX_VALID so the FIFO retains the byte you want
+to inspect. Read the data before the rising edge that accepts it. Waiting on
+RX_VALID with RX_READY already high can allow the byte to be consumed before
+your test checks it.
+
+Keep the original single-UART tests too: two identical UARTs can share a timing
+or bit-order mistake and still communicate with each other successfully.
 
 ## How to run
 
