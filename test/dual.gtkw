@@ -1,0 +1,62 @@
+[*] UART A to B: serial transfer, receive sampling, and FIFO acceptance
+[dumpfile] "tb_dual.fst"
+[savefile] "dual.gtkw"
+[timestart] 0
+[size] 1500 900
+[treeopen] tb_dual.
+[treeopen] tb_dual.uart_b.
+[treeopen] tb_dual.uart_b.rx_fifo.
+[signals_width] 320
+@200
+-Clock and reset
+@28
+tb_dual.clk
+tb_dual.rst_n
+@200
+-A parallel transmit
+@22
+tb_dual.a_tx_data[7:0]
+@28
+tb_dual.a_tx_valid
+tb_dual.a_tx_ready
+@200
+-Serial A to B
+@28
+tb_dual.a_tx
+tb_dual.b_rx
+tb_dual.uart_b.rx_meta
+tb_dual.uart_b.rx_sync
+@200
+-B receive assembly
+@22
+tb_dual.uart_b.rx_state[1:0]
+tb_dual.uart_b.rx_bits[2:0]
+tb_dual.uart_b.rx_baud_cnt[6:0]
+tb_dual.uart_b.rx_shift[7:0]
+@200
+-B FIFO and parallel receive
+@28
+tb_dual.uart_b.fifo_wr_en
+tb_dual.uart_b.rx_fifo.push
+tb_dual.b_rx_valid
+tb_dual.b_rx_ready
+tb_dual.uart_b.rx_fifo.pop
+@22
+tb_dual.b_rx_data[7:0]
+tb_dual.uart_b.rx_fifo.wr_ptr[2:0]
+tb_dual.uart_b.rx_fifo.rd_ptr[2:0]
+tb_dual.uart_b.rx_fifo.count[3:0]
+@28
+tb_dual.b_fifo_full
+tb_dual.b_rx_error
+@200
+-Reverse direction
+@22
+tb_dual.b_tx_data[7:0]
+@28
+tb_dual.b_tx
+tb_dual.a_rx
+tb_dual.a_rx_valid
+tb_dual.a_rx_ready
+@22
+tb_dual.a_rx_data[7:0]

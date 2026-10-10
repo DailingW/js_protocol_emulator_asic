@@ -39,6 +39,12 @@ make -f Makefile.dual
 ```
 
 The waveform is `tb_dual.fst`; results are in `results_dual.xml`.
+Open the provided signal selection with `gtkwave tb_dual.fst dual.gtkw`.
+It groups A's parallel input, the A-to-B serial connection, B's receive shift
+register, and B's FIFO/parallel handshake. B's `rx_data` is valid only while
+`b_rx_valid` is high: after the last queued byte is popped, the output becomes
+zero. In `one_byte_each_way`, zoom near 1002–1003 us to see B enqueue and consume
+the first `0xA5`; a one-clock-wide parallel byte is hard to see at frame scale.
 In this bench, Python drives only the parallel interfaces. The actual DUTs
 generate and decode the serial frames:
 
