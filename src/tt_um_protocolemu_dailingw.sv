@@ -107,11 +107,12 @@ module tt_um_protocolemu_dailingw (
   end
 
   // ================ RX state machine ================
-  typedef enum logic [1:0] {
-        IDLE  = 2'b00,
-        START = 2'b01,
-        DATA = 2'b10,
-        STOP = 2'b11
+  typedef enum logic [2:0] {
+        IDLE  = 3'b000,
+        START = 3'b001,
+        DATA = 3'b010,
+        STOP = 3'b011,
+        RECOVER = 3'b100
   } rx_read_state;
   rx_read_state rx_state;
 
@@ -177,6 +178,18 @@ module tt_um_protocolemu_dailingw (
               fifo_wr_en <= 1'b1;
             end else begin
               rx_error <= 1'b1;
+              rx_state <= RECOVER;
+            end
+          end else begin
+            rx_baud_cnt <= rx_baud_cnt + 1;
+          end
+        end
+
+        RECOVER: begin
+          if (rx_baud_cnt == BIT_LAST) begin
+            rx_baud_cnt <= 0;
+            if (rx_sync) begin
+              rx_state <= IDLE;
             end
           end else begin
             rx_baud_cnt <= rx_baud_cnt + 1;

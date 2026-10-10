@@ -42,7 +42,20 @@ COCOTB_TEST_MODULES = test
 # include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim
 
-.PHONY: fifo-test
+# Cocotb's default `all` already runs `sim` (the single-UART bench).
+# Add the dual RTL bench to normal runs, but keep gate-level runs separate.
+ifneq ($(GATES),yes)
+all: dual-test
+endif
+
+all:
+	"$(PYTHON_BIN)" -m cocotb_tools.check_results $(COCOTB_RESULTS_FILE)
+
+.PHONY: dual-test fifo-test
+dual-test:
+	$(MAKE) -f Makefile.dual
+	"$(PYTHON_BIN)" -m cocotb_tools.check_results results_dual.xml
+
 fifo-test:
 	mkdir -p sim_build/fifo
 	iverilog -g2012 -s fifo_tb -o sim_build/fifo/sim.vvp $(SRC_DIR)/fifo.sv fifo_tb.sv

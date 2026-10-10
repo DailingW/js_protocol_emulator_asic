@@ -64,11 +64,19 @@ or bit-order mistake and still communicate with each other successfully.
 
 ## How to run
 
-To run the RTL simulation:
+From this directory, run both the single-UART and dual-UART RTL suites:
 
 ```sh
-make -B
+make
 ```
+
+The suites use separate build directories, reports (`results.xml` and
+`results_dual.xml`), and waveforms (`tb.fst` and `tb_dual.fst`). A failed suite
+makes the command fail.
+
+For only one suite, use `make sim` (single UART) or `make dual-test` (dual UART).
+`make -f Makefile.dual` remains available for running or filtering dual tests
+directly. Gate-level runs below execute only the single-UART gate-level bench.
 
 To run gatelevel simulation, first harden your project and copy `../runs/wokwi/results/final/verilog/gl/{your_module_name}.v` to `gate_level_netlist.v`.
 

@@ -1,4 +1,4 @@
-# Separate RTL-only runner; the existing `make` still runs test.py.
+# Separate RTL-only runner, also invoked by the main Makefile's dual-test target.
 SIM ?= icarus
 FST ?= -fst
 TOPLEVEL_LANG = verilog

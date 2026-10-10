@@ -164,6 +164,34 @@ async def false_start_and_framing_error(dut):
 
 
 @cocotb.test()
+async def sustained_low_recovery(dut):
+    pins = await setup(dut)
+    # Vary the release time: without RECOVER, a new frame attempt could be
+    # partway through its data bits when the held-low line returns high.
+    for low_clocks, value in ((14 * BIT_CLOCKS + 17, 0xA5),
+                              (25 * BIT_CLOCKS + 53, 0x3C),
+                              (40 * BIT_CLOCKS + 91, 0x96)):
+        pins.set(rx=0)
+        for _ in range(low_clocks):
+            await tick(dut)
+            assert_empty(dut)
+        assert int(dut.uio_out.value) & RX_ERROR, "Missing stop bit must flag an error"
+
+        pins.set(rx=1)
+        # Allow even a stale frame attempt enough time to finish. Keep the
+        # consumer stalled so any bogus byte remains visible in the FIFO.
+        for _ in range(11 * BIT_CLOCKS):
+            await tick(dut)
+            assert_empty(dut)
+
+        await receive(pins, value)
+        await take(pins, value)
+        await tick(dut, 2)
+        assert_empty(dut)  # Exactly one byte was queued.
+        assert int(dut.uio_out.value) & RX_ERROR, "Recovery must not clear the sticky error"
+
+
+@cocotb.test()
 async def reset_during_full_duplex(dut):
     pins = await setup(dut)
     dut.ui_in.value = 0x55

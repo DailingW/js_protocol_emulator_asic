@@ -41,6 +41,12 @@ bytes are preserved. FIFO full is a status output, not serial flow control:
 the sender must be paced externally if the consumer may stall indefinitely.
 Both parallel interfaces must obey setup/hold timing relative to `clk`.
 
+After an invalid stop bit, the receiver enters `RECOVER` and waits for the
+synchronized RX line to go high before accepting another start bit. This
+prevents a sustained low (UART break) from triggering repeated frame attempts
+and potentially queuing a bogus byte when the line returns high. Recovery
+checks the line once per bit period; returning high does not clear `RX_ERROR`.
+
 ## How to test
 
 Hold `rst_n` low to reset. Keep UART RX high when idle. Offer a transmit byte
@@ -49,6 +55,9 @@ bytes. RX_READY may be held low to retain queued bytes.
 
 Run `make` from `test/` for UART integration tests and `make fifo-test` for
 FIFO boundary, simultaneous read/write, and randomized ordering tests.
+The single-UART `sustained_low_recovery` test holds RX low for several durations,
+checks that neither the low interval nor its release queues a byte, and verifies
+that a subsequent valid frame is received while `RX_ERROR` remains set.
 
 ## External hardware
 
