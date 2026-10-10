@@ -23,7 +23,7 @@ module tt_um_protocolemu_dailingw (
   // [6]: tx, [7]: rx
   logic tx_valid, tx_ready;
   logic rx_valid, rx_ready, rx_error;
-  wire rx;
+  wire tx, rx;
   logic [9:0] tx_frame;
   logic [7:0] rx_data;
   logic [7:0] rx_shift;
@@ -41,12 +41,13 @@ module tt_um_protocolemu_dailingw (
   );
 
   assign tx_valid = uio_in[0];
+  assign tx = tx_frame[0];
   assign rx_ready = uio_in[3];
   assign rx = uio_in[7];
   assign rx_valid = !fifo_empty;
   assign fifo_rd_en = rx_valid && rx_ready;
   assign uio_oe = 8'b01110110;
-  assign uio_out = {1'b0, tx_frame[0], rx_error, fifo_full, 1'b0, rx_valid, tx_ready, 1'b0};
+  assign uio_out = {1'b0, tx, rx_error, fifo_full, 1'b0, rx_valid, tx_ready, 1'b0};
   assign uo_out = rx_data;
 
   localparam int unsigned BAUD = 9600;
