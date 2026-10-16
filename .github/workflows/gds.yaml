@@ -13,6 +13,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Prepare Ibex synthesis source
+        run: python3 scripts/prepare_ibex.py
+
       - name: Build GDS
         uses: TinyTapeout/tt-gds-action@ttihp26b
         with:
