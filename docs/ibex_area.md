@@ -42,6 +42,14 @@ The source list in `info.yaml` covers this configuration. Enabling features such
 as cache, multiplication, PMP, or security also requires their RTL/primitive
 dependencies in that list.
 
+`src/ibex_lint.vlt` is passed only to Verilator using `LINTER_VLT`. It waives
+intentional open outputs, unused vendor configuration constants, the disabled
+multiplier/divider's unused or unselected undriven signals, and specific upstream
+decode/control scheduling warnings. These waivers change no RTL or synthesis
+behavior. Checks remain enabled for the TT top and for other warning types,
+including missing pins, width mismatches, inferred latches, and multiple drivers.
+Review the waivers when changing the core configuration or upstream revision.
+
 The upstream `ibex_top.sv` contains a nonconstant declaration initializer on the
 unused signal `unused_scramble_inputs`. Slang rejects that initialization.
 `scripts/prepare_ibex.py` changes that one declaration from `logic` to `wire` in

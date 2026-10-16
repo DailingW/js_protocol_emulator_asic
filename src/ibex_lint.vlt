@@ -1,0 +1,70 @@
+// SPDX-License-Identifier: Apache-2.0
+// Project waivers for the RV32EC area reference. No synthesis behavior changes.
+// LibreLane passes this file to Verilator before the RTL via LINTER_VLT.
+`verilator_config
+
+// Upstream intentionally leaves optional error/status outputs open. Our wrapper
+// similarly leaves disabled cache, ECC, CHERIoT, and lockstep outputs open.
+// PINMISSING and other connection checks remain enabled.
+lint_off -rule PINCONNECTEMPTY -file "*vendor/ibex/rtl/*.sv"
+lint_off -rule PINCONNECTEMPTY -file "*src/generated/ibex_top.sv"
+lint_off -rule PINCONNECTEMPTY -file "*src/ibex_area_core.sv"
+lint_off -rule PINCONNECTEMPTY -file "*vendor/ibex/vendor/lowrisc_ip/ip/prim/rtl/prim_ram_1p_scr.sv"
+lint_off -rule PINCONNECTEMPTY -file "*vendor/ibex/vendor/lowrisc_ip/ip/prim/rtl/prim_ram_1p_adv.sv"
+
+// Shared packages define constants for ISA/configuration features we disable.
+lint_off -rule UNUSEDPARAM -file "*vendor/ibex/rtl/*_pkg.sv"
+lint_off -rule UNUSEDPARAM -file "*vendor/ibex/vendor/lowrisc_ip/ip/*/rtl/*_pkg.sv"
+
+// Unused implementation parameters in this no-cache/non-secure configuration.
+lint_off -rule UNUSEDPARAM -file "*src/generated/ibex_top.sv" -match "*'CheriotRevBitmapAddrWidth'*"
+lint_off -rule UNUSEDPARAM -file "*src/generated/ibex_top.sv" -match "*'CheriotRevBitmapBaseAddr'*"
+lint_off -rule UNUSEDPARAM -file "*src/generated/ibex_top.sv" -match "*'LockstepOffset'*"
+lint_off -rule UNUSEDPARAM -file "*src/generated/ibex_top.sv" -match "*'RegFileLockstepECC'*"
+lint_off -rule UNUSEDPARAM -file "*src/generated/ibex_top.sv" -match "*'RegFileDataEccWidth'*"
+lint_off -rule UNUSEDPARAM -file "*src/generated/ibex_top.sv" -match "*'RegFileCapEccWidth'*"
+lint_off -rule UNUSEDPARAM -file "*src/generated/ibex_top.sv" -match "*'MaxOutstandingDSideAccesses'*"
+lint_off -rule UNUSEDPARAM -file "*vendor/ibex/vendor/lowrisc_ip/ip/prim_generic/rtl/prim_clock_gating.sv" -match "*'NoFpgaGate'*"
+lint_off -rule UNUSEDPARAM -file "*vendor/ibex/vendor/lowrisc_ip/ip/prim_generic/rtl/prim_clock_gating.sv" -match "*'FpgaBufGlobal'*"
+lint_off -rule UNUSEDPARAM -file "*vendor/ibex/rtl/ibex_core.sv" -match "*'DmBaseAddr'*"
+lint_off -rule UNUSEDPARAM -file "*vendor/ibex/rtl/ibex_core.sv" -match "*'DmAddrMask'*"
+lint_off -rule UNUSEDPARAM -file "*vendor/ibex/rtl/ibex_if_stage.sv" -match "*'ICacheECC'*"
+lint_off -rule UNUSEDPARAM -file "*vendor/ibex/rtl/ibex_if_stage.sv" -match "*'ICacheTweakInfection'*"
+lint_off -rule UNUSEDPARAM -file "*vendor/ibex/rtl/ibex_if_stage.sv" -match "*'BusSizeECC'*"
+lint_off -rule UNUSEDPARAM -file "*vendor/ibex/rtl/ibex_if_stage.sv" -match "*'RndCnstLfsrSeed'*"
+lint_off -rule UNUSEDPARAM -file "*vendor/ibex/rtl/ibex_if_stage.sv" -match "*'RndCnstLfsrPerm'*"
+
+// RV32MNone makes multdiv_sel constant zero. These multiplier-only nets are
+// never selected by the ALU/result/valid/intermediate-register muxes.
+lint_off -rule UNDRIVEN -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'multdiv_result'*"
+lint_off -rule UNDRIVEN -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'multdiv_alu_operand_a'*"
+lint_off -rule UNDRIVEN -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'multdiv_alu_operand_b'*"
+lint_off -rule UNDRIVEN -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'multdiv_valid'*"
+lint_off -rule UNDRIVEN -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'multdiv_imd_val_d'*"
+lint_off -rule UNDRIVEN -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'multdiv_imd_val_we'*"
+
+// Inputs/results used only by the optional multiplier/divider implementation.
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'clk_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'rst_ni'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'multdiv_operator_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'mult_en_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'div_en_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'mult_sel_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'div_sel_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'multdiv_signed_mode_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'multdiv_operand_a_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'multdiv_operand_b_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'multdiv_ready_id_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'data_ind_timing_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'imd_val_q_i'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'alu_adder_result_ext'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_ex_block.sv" -match "*'alu_is_equal_result'*"
+lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_core.sv" -match "*'instr_first_cycle_id'*"
+
+// Upstream Simple System also waives these decode/control scheduling paths.
+// Keep this signal-specific: UNOPTFLAT can indicate a real loop elsewhere.
+lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_id_stage.sv" -match "*instr_executing_spec*"
+lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_id_stage.sv" -match "*instr_done*"
+lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_controller.sv" -match "*special_req*"
+lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_controller.sv" -match "*id_in_ready_o*"
+lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_core.sv" -match "*id_in_ready*"
