@@ -44,7 +44,7 @@ dependencies in that list.
 
 `src/ibex_lint.vlt` is passed only to Verilator using `LINTER_VLT`. It waives
 intentional open outputs, unused vendor configuration constants, the disabled
-multiplier/divider's unused or unselected undriven signals, and specific upstream
+multiplier/divider's unused signals, and specific upstream
 decode/control scheduling warnings. These waivers change no RTL or synthesis
 behavior. Checks remain enabled for the TT top and for other warning types,
 including missing pins, width mismatches, inferred latches, and multiple drivers.
@@ -56,6 +56,14 @@ unused signal `unused_scramble_inputs`. Slang rejects that initialization.
 an ignored generated copy at `src/generated/ibex_top.sv`. This makes it a
 continuous unused-input expression and leaves the submodule untouched. Do not
 compile both the original and generated `ibex_top`.
+
+The preparation step also generates `src/generated/ibex_ex_block.sv`, adding
+explicit zero tie-offs to the absent multiplier/divider's outputs under
+`RV32MNone`. This fixes the 66 undriven-bit diagnostics in LibreLane's early
+Yosys check. The affected paths are unselected and disappear during optimization,
+but the flow counts the early diagnostics even when the final netlist checks
+cleanly. Synthesis checks remain enabled. Compile the generated execute block
+instead of the original; the submodule remains unchanged.
 
 After a fresh checkout, run `python3 scripts/prepare_ibex.py` before local tools
 read `info.yaml`. The GDS workflow already does this automatically.

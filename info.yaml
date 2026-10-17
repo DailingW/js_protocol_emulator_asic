@@ -35,7 +35,7 @@ project:
     - "vendor/ibex/rtl/ibex_cs_registers.sv"
     - "vendor/ibex/rtl/ibex_csr.sv"
     - "vendor/ibex/rtl/ibex_decoder.sv"
-    - "vendor/ibex/rtl/ibex_ex_block.sv"
+    - "generated/ibex_ex_block.sv"
     - "vendor/ibex/rtl/ibex_fetch_fifo.sv"
     - "vendor/ibex/rtl/ibex_id_stage.sv"
     - "vendor/ibex/rtl/ibex_if_stage.sv"
