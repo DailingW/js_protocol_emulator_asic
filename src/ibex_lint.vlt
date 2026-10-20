@@ -56,6 +56,14 @@ lint_off -rule UNUSEDSIGNAL -file "*vendor/ibex/rtl/ibex_core.sv" -match "*'inst
 // Keep this signal-specific: UNOPTFLAT can indicate a real loop elsewhere.
 lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_id_stage.sv" -match "*instr_executing_spec*"
 lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_id_stage.sv" -match "*instr_done*"
+// Public simulation signals expose the port on the same decode/control path.
+lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_id_stage.sv" -match "*instr_id_done_o*"
 lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_controller.sv" -match "*special_req*"
 lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_controller.sv" -match "*id_in_ready_o*"
 lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_core.sv" -match "*id_in_ready*"
+
+// SRAM declarations share a file; the copied functional model uses IHP's
+// original module name and ignores the timing-trim input in functional mode.
+lint_off -rule DECLFILENAME -file "*src/sram.sv"
+lint_off -rule DECLFILENAME -file "*test/ihp_sram/RM_IHPSG13_1P_core_behavioral_bm_bist.v"
+lint_off -rule UNUSEDSIGNAL -file "*test/ihp_sram/RM_IHPSG13_1P_core_behavioral_bm_bist.v" -match "*'A_DLY'*"

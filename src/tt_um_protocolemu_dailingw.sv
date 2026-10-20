@@ -16,47 +16,39 @@ module tt_um_protocolemu_dailingw (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // Area-reference harness, not a complete SoC: no program ROM or data RAM.
-  // Load any byte of the two independent memory response words:
-  //   uio_in[3] = write enable, uio_in[2:0] = byte index, ui_in = byte data.
-  // Indices 0..3 load instruction data; indices 4..7 load data-memory data.
-  // With write enable low, ui_in supplies the bus handshake/control signals.
-  // Keeping all 32 response bits independently controllable avoids specializing
-  // the processor to a constant instruction stream or a narrow load-data bus.
-  reg [31:0] instr_rdata;
-  reg [31:0] data_rdata;
-  always @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
-      instr_rdata <= 32'b0;
-      data_rdata  <= 32'b0;
-    end else if (ena && uio_in[3]) begin
-      case (uio_in[2:0])
-        3'd0: instr_rdata[7:0]   <= ui_in;
-        3'd1: instr_rdata[15:8]  <= ui_in;
-        3'd2: instr_rdata[23:16] <= ui_in;
-        3'd3: instr_rdata[31:24] <= ui_in;
-        3'd4: data_rdata[7:0]    <= ui_in;
-        3'd5: data_rdata[15:8]   <= ui_in;
-        3'd6: data_rdata[23:16]  <= ui_in;
-        3'd7: data_rdata[31:24]  <= ui_in;
-      endcase
-    end
-  end
-
-  wire bus_active = ena && !uio_in[3];
+  // Strictly separate instruction/data SRAM paths. A future loader must fill
+  // both banks before the CPU starts; the SRAMs have no power-up contents.
+  wire [31:0] instr_rdata, data_rdata;
+  wire instr_gnt, instr_rvalid, instr_err;
+  wire data_gnt, data_rvalid, data_err;
   wire instr_req, data_req, data_we;
   wire [3:0] data_be;
   wire [31:0] instr_addr, data_addr, data_wdata;
   wire core_sleep, alert_minor, alert_major_internal, alert_major_bus;
   wire double_fault_seen;
 
+  wire program_en, program_we;
+  wire [3:0] program_be;
+  wire [9:0] program_word_addr;
+  wire [31:0] program_wdata, program_rdata;
+  wire data_mem_en, data_mem_we;
+  wire [3:0] data_mem_be;
+  wire [8:0] data_mem_word_addr;
+  wire [31:0] data_mem_wdata, data_mem_rdata;
+
   // RV32EC configuration and all Ibex tie-offs are in ibex_area_core.sv.
   ibex_area_core u_ibex (
     .clk(clk),
     .rst_n(rst_n),
     .ena(ena),
-    .bus_active(bus_active),
-    .ui_in(ui_in),
+    .instr_gnt(instr_gnt),
+    .instr_rvalid(instr_rvalid),
+    .instr_err(instr_err),
+    .data_gnt(data_gnt),
+    .data_rvalid(data_rvalid),
+    .data_err(data_err),
+    .irq_external(ena && ui_in[6]),
+    .debug_req(ena && ui_in[7]),
     .instr_rdata(instr_rdata),
     .data_rdata(data_rdata),
     .instr_req(instr_req),
@@ -71,6 +63,39 @@ module tt_um_protocolemu_dailingw (
     .alert_major_internal(alert_major_internal),
     .alert_major_bus(alert_major_bus),
     .double_fault_seen(double_fault_seen)
+  );
+
+  sram_logic u_sram_logic (
+    .clk(clk),
+    .rst_n(rst_n),
+    .ena(ena),
+    .instr_req(instr_req),
+    .instr_addr(instr_addr),
+    .instr_gnt(instr_gnt),
+    .instr_rvalid(instr_rvalid),
+    .instr_rdata(instr_rdata),
+    .instr_err(instr_err),
+    .data_req(data_req),
+    .data_we(data_we),
+    .data_be(data_be),
+    .data_addr(data_addr),
+    .data_wdata(data_wdata),
+    .data_gnt(data_gnt),
+    .data_rvalid(data_rvalid),
+    .data_rdata(data_rdata),
+    .data_err(data_err),
+    .program_en(program_en),
+    .program_we(program_we),
+    .program_be(program_be),
+    .program_word_addr(program_word_addr),
+    .program_wdata(program_wdata),
+    .program_rdata(program_rdata),
+    .data_mem_en(data_mem_en),
+    .data_mem_we(data_mem_we),
+    .data_mem_be(data_mem_be),
+    .data_mem_word_addr(data_mem_word_addr),
+    .data_mem_wdata(data_mem_wdata),
+    .data_mem_rdata(data_mem_rdata)
   );
 
   // Every byte of the CPU's address/write-data outputs is observable. An unused
@@ -93,11 +118,32 @@ module tt_um_protocolemu_dailingw (
       4'd12: observation = {core_sleep, data_be, data_we, data_req, instr_req};
       4'd13: observation = {4'b0, double_fault_seen, alert_major_bus,
                             alert_major_internal, alert_minor};
+      4'd14: observation = {2'b0, data_err, instr_err, data_rvalid,
+                            instr_rvalid, data_gnt, instr_gnt};
       default: observation = 8'b0;
     endcase
   end
   assign uo_out  = observation;
   assign uio_out = 8'b0;
   assign uio_oe  = 8'b0;
+
+  sram_banks u_mem (
+    .clk(clk),
+    .program_en(program_en),
+    .program_we(program_we),
+    .program_be(program_be),
+    .program_word_addr(program_word_addr),
+    .program_wdata(program_wdata),
+    .program_rdata(program_rdata),
+    .data_en(data_mem_en),
+    .data_we(data_mem_we),
+    .data_be(data_mem_be),
+    .data_word_addr(data_mem_word_addr),
+    .data_wdata(data_mem_wdata),
+    .data_rdata(data_mem_rdata)
+  );
+
+  // Reserved for the future loader; these pins no longer drive CPU responses.
+  wire _unused = &{1'b0, ui_in[5:0], uio_in[3:0]};
 
 endmodule

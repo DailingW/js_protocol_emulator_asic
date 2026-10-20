@@ -46,19 +46,22 @@ project:
     - "vendor/ibex/rtl/ibex_core.sv"
     - "generated/ibex_top.sv"
     - "ibex_area_core.sv"
+    - "sram.sv"
+    - "sram_logic.sv"
+    - "sram_banks.sv"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
 pinout:
   # Inputs
-  ui[0]: "byte data / instruction grant"
-  ui[1]: "byte data / instruction response valid"
-  ui[2]: "byte data / data grant"
-  ui[3]: "byte data / data response valid"
-  ui[4]: "byte data / instruction error"
-  ui[5]: "byte data / data error"
-  ui[6]: "byte data / external interrupt"
-  ui[7]: "byte data / debug request"
+  ui[0]: ""
+  ui[1]: ""
+  ui[2]: ""
+  ui[3]: ""
+  ui[4]: ""
+  ui[5]: ""
+  ui[6]: "external interrupt"
+  ui[7]: "debug request"
 
   # Outputs
   uo[0]: "observation byte bit 0"
@@ -71,10 +74,10 @@ pinout:
   uo[7]: "observation byte bit 7"
 
   # Bidirectional pins
-  uio[0]: "response byte index 0"
-  uio[1]: "response byte index 1"
-  uio[2]: "response byte index 2"
-  uio[3]: "response byte write enable"
+  uio[0]: ""
+  uio[1]: ""
+  uio[2]: ""
+  uio[3]: ""
   uio[4]: "observation selector 0"
   uio[5]: "observation selector 1"
   uio[6]: "observation selector 2"

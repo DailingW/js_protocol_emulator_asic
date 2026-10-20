@@ -9,10 +9,12 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-The current top is an RV32EC Ibex area-reference harness. It exposes controllable
-memory responses and observable CPU buses so synthesis retains the core without
-requiring firmware or on-chip memory. See [Ibex area reference](ibex_area.md) for
-configuration, synthesis commands, and pin behavior.
+The current top connects an RV32EC Ibex core to independent 4 KiB instruction
+and 2 KiB data SRAM banks through a one-cycle adapter. Code goes in instruction
+SRAM; constants, globals, stack, and buffers go in data SRAM. See
+[SRAM integration](sram.md) for the address map, handshake behavior, and tests.
+The external program loader and physical SRAM placement/power configuration
+remain to be implemented; the simulation testbench preloads its test program.
 
 ## How to test
 

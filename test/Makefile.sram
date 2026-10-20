@@ -1,0 +1,26 @@
+# Run from test/: make -f Makefile.sram [SRAM_TEST=logic]
+# Exercises SRAM banks or the adapter, without Ibex sources or a PDK install.
+SIM ?= icarus
+SRAM_TEST ?= banks
+TOPLEVEL_LANG ?= verilog
+SIM_BUILD = sim_build/sram_$(SRAM_TEST)
+COCOTB_RESULTS_FILE = $(SIM_BUILD)/results.xml
+COMPILE_ARGS += -g2012
+
+include $(PWD)/sram_models.mk
+VERILOG_SOURCES += $(PWD)/../src/sram.sv
+VERILOG_SOURCES += $(PWD)/../src/sram_banks.sv
+ifeq ($(SRAM_TEST),banks)
+VERILOG_SOURCES += $(PWD)/tb_sram.sv
+TOPLEVEL = tb_sram
+COCOTB_TEST_MODULES = test_sram
+else ifeq ($(SRAM_TEST),logic)
+VERILOG_SOURCES += $(PWD)/../src/sram_logic.sv
+VERILOG_SOURCES += $(PWD)/tb_sram_logic.sv
+TOPLEVEL = tb_sram_logic
+COCOTB_TEST_MODULES = test_sram_logic
+else
+$(error SRAM_TEST must be banks or logic)
+endif
+
+include $(shell cocotb-config --makefiles)/Makefile.sim

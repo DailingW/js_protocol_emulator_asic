@@ -9,32 +9,29 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install iverilog
-        shell: bash
-        run: sudo apt-get update && sudo apt-get install -y iverilog
-
-      # Set Python up and install cocotb
-      - name: Setup python
-        uses: actions/setup-python@v6
+      # Ibex RTL needs SystemVerilog support and a recent Verilator. Use the
+      # suite's bundled cocotb/Python for both Verilator and Icarus tests.
+      - name: Install simulation tools
+        uses: YosysHQ/setup-oss-cad-suite@v4
         with:
-          python-version: '3.11'
-
-      - name: Install Python packages
-        shell: bash
-        run: pip install -r test/requirements.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          python-override: true
 
       - name: Run tests
         run: |
           cd test
-          make clean
+          make -f Makefile.sram
+          make -f Makefile.sram SRAM_TEST=logic
           make
-          # make will return success even if the tests fail, so check results.xml for failed tests
           python -m cocotb_tools.check_results results.xml
 
       - name: Test Summary
         uses: test-summary/action@v2.4
         with:
-          paths: "test/results.xml"
+          paths: |
+            test/results.xml
+            test/sim_build/sram_banks/results.xml
+            test/sim_build/sram_logic/results.xml
         if: always()
 
       - name: upload waveform and test results
@@ -45,4 +42,6 @@ jobs:
           path: |
             test/tb.fst
             test/results.xml
+            test/sim_build/sram_banks/results.xml
+            test/sim_build/sram_logic/results.xml
             test/output/*

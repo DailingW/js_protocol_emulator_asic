@@ -1,5 +1,9 @@
 # RV32EC area reference
 
+This document records the earlier area-reference harness. The current TT top
+has since been connected to instruction/data SRAM through `sram_logic`; see
+[SRAM integration](sram.md) for current wiring, pin behavior, and tests.
+
 `src/tt_um_protocolemu_dailingw.sv` now instantiates `ibex_area_core`, which
 instantiates upstream `ibex_top`. Change the explicit parameters in
 `src/ibex_area_core.sv` to change the synthesized configuration. FuseSoC and

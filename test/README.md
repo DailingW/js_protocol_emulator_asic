@@ -1,47 +1,37 @@
-# Sample testbench for a Tiny Tapeout project
+# SRAM and CPU tests
 
-This is a sample testbench for a Tiny Tapeout project. It uses [cocotb](https://docs.cocotb.org/en/stable/) to drive the DUT and check the outputs.
-See below to get started or for more information, check the [website](https://tinytapeout.com/hdl/testing/).
-
-## Setting up
-
-1. Edit [Makefile](Makefile) and modify `PROJECT_SOURCES` to point to your Verilog files.
-2. Edit [tb.v](tb.v) and replace `tt_um_example` with your module name.
-
-## How to run
-
-To run the RTL simulation:
+Use the existing OSS CAD Suite with cocotb. No separate Python environment is
+needed. Run the following from `test/`:
 
 ```sh
-make -B
+make -f Makefile.sram
+make -f Makefile.sram SRAM_TEST=logic
+make
 ```
 
-To run gatelevel simulation, first harden your project and copy `../runs/wokwi/results/final/verilog/gl/{your_module_name}.v` to `gate_level_netlist.v`.
+The first command tests the two raw SRAM banks. The second tests the memory
+adapter against the real SRAM models, including simultaneous requests, byte
+writes, invalid-address handling, and reset/enable timing. Both use Icarus Verilog.
 
-Then run:
+The normal `make` target tests the complete Ibex + SRAM system using Verilator
+5.036 or newer and a C++ compiler. It replaces the original sample adder test.
+Generated Ibex sources are prepared automatically. The testbench preloads the
+checked-in `programs/sram_smoke.hex`, so a software compiler is not needed to run
+it. The program performs word/byte/halfword memory operations and ends in `WFI`.
+The test checks CPU transactions through the top-level observation pins.
+
+`Makefile.sram` is an alternative Makefile for isolated memory tests;
+`sram_models.mk` shares the SRAM simulation sources and defines between both
+Makefiles. See [SRAM integration](../docs/sram.md) for the address map, signal
+roles, and current top-level pin behavior.
+
+For Verilator waveform output, run:
 
 ```sh
-make -B GATES=yes
+make VERILATOR_TRACE=1
 ```
 
-If you wish to save the waveform in VCD format instead of FST format, edit tb.v to use `$dumpfile("tb.vcd");` and then run:
-
-```sh
-make -B FST=
-```
-
-This will generate `tb.vcd` instead of `tb.fst`.
-
-## How to view the waveform file
-
-Using GTKWave
-
-```sh
-gtkwave tb.fst tb.gtkw
-```
-
-Using Surfer
-
-```sh
-surfer tb.fst
-```
+Gate-level simulation still needs a hardware loader to initialize program SRAM.
+The RTL testbench's direct model preload is not available in a synthesized
+netlist. Physical macro views, placement, and power-grid configuration also
+remain to be integrated before a full hardening/sign-off run.

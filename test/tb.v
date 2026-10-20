@@ -6,12 +6,14 @@
 */
 module tb ();
 
-  // Dump the signals to a FST file. You can view it with gtkwave or surfer.
+`ifndef VERILATOR
+  // Icarus waveform output; Verilator uses its VERILATOR_TRACE option.
   initial begin
     $dumpfile("tb.fst");
     $dumpvars(0, tb);
     #1;
   end
+`endif
 
   // Wire up the inputs and outputs:
   reg clk;
@@ -34,5 +36,16 @@ module tb ();
       .clk    (clk),      // clock
       .rst_n  (rst_n)     // not reset
   );
+
+`ifndef GL_TEST
+  // Test-only program loading, while the CPU is held in reset by test.py.
+  // These hierarchical writes do not implement a loader on the physical chip.
+  initial begin
+    for (integer i = 0; i < 1024; i = i + 1)
+      user_project.u_mem.u_program.i_SRAM_1P_behavioral_bm_bist.memory[i] = 32'h00000013;
+    $readmemh("programs/sram_smoke.hex",
+              user_project.u_mem.u_program.i_SRAM_1P_behavioral_bm_bist.memory, 32, 47);
+  end
+`endif
 
 endmodule
