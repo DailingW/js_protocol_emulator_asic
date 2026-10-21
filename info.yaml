@@ -46,9 +46,9 @@ project:
     - "vendor/ibex/rtl/ibex_core.sv"
     - "generated/ibex_top.sv"
     - "ibex_area_core.sv"
-    - "sram.sv"
-    - "sram_logic.sv"
-    - "sram_banks.sv"
+    - "sram/sram.sv"
+    - "sram/sram_logic.sv"
+    - "sram/sram_banks.sv"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).

@@ -41,7 +41,7 @@ PROJECT_SOURCES = \
   vendor/ibex/rtl/ibex_core.sv \
   generated/ibex_top.sv \
   ibex_area_core.sv \
-  sram.sv sram_logic.sv sram_banks.sv
+  sram/sram.sv sram/sram_logic.sv sram/sram_banks.sv
 
 # SRAM behavioural models are needed by both RTL and gate-level simulation.
 include $(PWD)/sram_models.mk

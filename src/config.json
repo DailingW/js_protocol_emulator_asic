@@ -145,5 +145,15 @@
     "Metal2 452.96 3.78 869.60 192.12",
     "Metal3 452.96 3.78 869.60 195.12",
     "Metal4 452.96 3.78 869.60 195.12"
-  ]
+  ],
+  "EXTEND_STRIPES_SRAM_ALL_COLUMNS": false,
+  "EXTEND_STRIPES_SRAM_ARRAY_EVERY_OTHER": true,
+  "EXTEND_STRIPES_PIN_FACE_MARGIN": 0,
+  "meta": {
+    "flow": "Classic",
+    "substituting_steps": {
+      "+OpenROAD.GeneratePDN": "Project.ExtendPowerStripes"
+    }
+  },
+  "PDN_CFG": "dir::sram/pdn_cfg.tcl"
 }

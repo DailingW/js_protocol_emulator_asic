@@ -62,8 +62,14 @@ lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_controller.sv" -match "*sp
 lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_controller.sv" -match "*id_in_ready_o*"
 lint_off -rule UNOPTFLAT -file "*vendor/ibex/rtl/ibex_core.sv" -match "*id_in_ready*"
 
-// SRAM declarations share a file; the copied functional model uses IHP's
-// original module name and ignores the timing-trim input in functional mode.
-lint_off -rule DECLFILENAME -file "*src/sram.sv"
+// Empty SRAM macro declarations have no behavior to consume inputs or drive
+// outputs. Waive only this declaration file; keep checks on the bus adapter,
+// bank wrapper, and functional models. Synthesis still uses the physical macros.
+lint_off -rule DECLFILENAME -file "*src/sram/sram.sv"
+lint_off -rule UNUSEDSIGNAL -file "*src/sram/sram.sv"
+lint_off -rule UNDRIVEN -file "*src/sram/sram.sv"
+
+// The copied functional model uses IHP's original module name and ignores the
+// timing-trim input in functional mode.
 lint_off -rule DECLFILENAME -file "*test/ihp_sram/RM_IHPSG13_1P_core_behavioral_bm_bist.v"
 lint_off -rule UNUSEDSIGNAL -file "*test/ihp_sram/RM_IHPSG13_1P_core_behavioral_bm_bist.v" -match "*'A_DLY'*"

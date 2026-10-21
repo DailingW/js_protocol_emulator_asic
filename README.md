@@ -3,6 +3,8 @@
 # Tiny Tapeout Verilog Project Template
 
 - [Read the documentation for project](docs/info.md)
+- [SRAM integration and tests](docs/sram.md)
+- [SRAM PDN setup, local checks, and GUI commands](src/sram/README.md)
 
 ## What is Tiny Tapeout?
 

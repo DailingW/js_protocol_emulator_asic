@@ -1,6 +1,8 @@
 .DS_Store
 .idea
 .venv-ibex/
+tt/
+__pycache__/
 *.vcd
 *.fst
 *.fst.hier
@@ -9,7 +11,6 @@ tt_submission
 src/user_config.json
 src/config_merged.json
 test/sim_build
-test/__pycache__/
 test/results.xml
 test/gate_level_netlist.v
 build/

@@ -33,5 +33,6 @@ make VERILATOR_TRACE=1
 
 Gate-level simulation still needs a hardware loader to initialize program SRAM.
 The RTL testbench's direct model preload is not available in a synthesized
-netlist. Physical macro views, placement, and power-grid configuration also
-remain to be integrated before a full hardening/sign-off run.
+netlist. Physical macro views, placement, and power-grid configuration are now
+set up; see [SRAM PDN setup and checks](../src/sram/README.md) for the local
+hardening commands and the checks still needed after routing.

@@ -13,9 +13,9 @@ tt_um_protocolemu_dailingw
 
 | File | Purpose |
 | --- | --- |
-| `src/sram.sv` | Empty macro declarations for synthesis. |
-| `src/sram_banks.sv` | The actual macro instances, BIST/delay tie-offs, and byte masks. |
-| `src/sram_logic.sv` | Address decoding, SRAM enables, grants, response timing, and errors. |
+| `src/sram/sram.sv` | Empty macro declarations for synthesis. |
+| `src/sram/sram_banks.sv` | The actual macro instances, BIST/delay tie-offs, and byte masks. |
+| `src/sram/sram_logic.sv` | Address decoding, SRAM enables, grants, response timing, and errors. |
 | `test/ihp_sram/*.v` | IHP functional implementations of the same macro names for simulation. |
 
 `SIM` hides the black boxes during simulation; `FUNCTIONAL` enables the copied
@@ -108,8 +108,9 @@ that can initialize both banks while keeping Ibex in reset, then release the CPU
 A gate-level boot test also needs that hardware loading path; only RTL boot is
 validated at this stage.
 
-Physical integration is still required in `src/config.json`: macro LEF/GDS/CDL
-and timing views, placement, power-pin connections, and the power grid. The
-expected instance paths are `u_mem.u_program` and `u_mem.u_data`; verify them
-against the synthesized hierarchy. Passing RTL tests does not validate SRAM
-placement or power connectivity.
+Physical integration is configured in `src/config.json`: macro LEF/GDS/CDL and
+timing views, placement, power-pin connections, and the power grid. The instance
+paths are `u_mem.u_program` and `u_mem.u_data`. See the
+[SRAM PDN setup and checks](../src/sram/README.md) for the custom stripe step,
+local LibreLane commands, GUI inspection, and IR-drop reporting. Initial PDN
+connectivity has been checked; full routing and signoff still need validation.
