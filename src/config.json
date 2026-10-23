@@ -45,6 +45,7 @@
   "RUN_POST_GRT_DESIGN_REPAIR": true,
   "PL_TIMING_DRIVEN": true,
   "MAX_TRANSITION_CONSTRAINT": 0.75,
+  "GRT_DESIGN_REPAIR_MAX_SLEW_PCT": 30,
   "//": "Don't put clock buffers on the outputs",
   "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": 0,
   "//": "Reduce wasted space",
