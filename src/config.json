@@ -43,6 +43,8 @@
   "ERROR_ON_ILLEGAL_OVERLAPS": 0,
   "RUN_POST_GRT_RESIZER_TIMING": true,
   "RUN_POST_GRT_DESIGN_REPAIR": true,
+  "PL_TIMING_DRIVEN": true,
+  "MAX_TRANSITION_CONSTRAINT": 0.75,
   "//": "Don't put clock buffers on the outputs",
   "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": 0,
   "//": "Reduce wasted space",
