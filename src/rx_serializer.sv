@@ -5,10 +5,10 @@ module rx_serializer (
     input logic [2:0] rx_width,             // [CONST] data bus width (000 = 1 bit, etc.)
     input logic [7:0] uio_in,               // input pads
     input logic [2:0] rx_index_map [7:0],   // [MEM] bit order map of parallel rx data pads
-    input logic sample_req,                 // downstream fifo requests data
     input logic rx_in_stream_valid,         // incoming data on pads is valid
+    input logic rx_out_stream_ready,          // ready to transfer data out of buf to downstream FIFO
 
-    output logic rx_busy,                   // serializing buffer items (can still request data)
+    output logic rx_in_stream_ready,        // ready to accept new data from pads
     output logic rx_out_stream,             // serialized bit stream
     output logic rx_out_stream_valid        // bit is real data
 );
@@ -18,8 +18,8 @@ logic [2:0] index_map_lane;
 logic busy, load, index_map_last_lane;
 
 assign index_map_last_lane = (index_map_lane == rx_width);
-assign rx_busy = busy;
-assign load = !busy || (busy && index_map_last_lane);   // ready to load new data into buf
+assign load = !busy || (rx_out_stream_ready && index_map_last_lane);  
+assign rx_in_stream_ready = rx_en && load;
 
 assign rx_out_stream_valid = rx_en && busy;
 assign rx_out_stream = rx_buf[rx_index_map[index_map_lane]];
@@ -41,7 +41,7 @@ always_ff @(posedge clk or negedge rst_n) begin
         if (rx_in_stream_valid) begin
             rx_buf <= uio_in;
         end
-    end else if (sample_req) begin
+    end else if (rx_out_stream_ready) begin
         // LSB to MSB or MSB to LSB depending on how rx_index_map is set
         index_map_lane <= index_map_lane + 3'b1;
     end
