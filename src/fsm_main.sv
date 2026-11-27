@@ -12,6 +12,16 @@ module fsm_main (
     output logic [15:0] timer
 );
 
+// SRAM memory
+// - State memory for the FSM 2x 64x64 per FSM, 4 total
+// Flip Flop CSRs (?)
+// - Bit order map 8x 3b per FSM, 48b total
+// - Counter 4x 16b per FSM, 128b total
+// - Counter limit 4x 16b per FSM, 128b total
+// - (optional) Counter alternate limits 4x 16b per counter limit, 256b total
+// - RX pattern match registers 4x 32b, 128b total
+// - State counter 6b per FSM, 12b total
+
 logic [7:0] uio_in_prev;  // last sampled pad state
 logic uio_in_prev_valid;  // initial settling on startup doesn't count
 logic [7:0] rise, fall;   // rising edge, falling edge detection

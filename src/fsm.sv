@@ -1,4 +1,4 @@
-module fsm import fsm_ctrl_pkg::*; (
+module fsm import fsm_ctrl_pkg::* import fsm_misc_pkg::*; (
     input logic clk,
     input logic rst,
     input logic en,
@@ -6,7 +6,7 @@ module fsm import fsm_ctrl_pkg::*; (
     input logic [7:0] uio_in,               // input pads
     input logic [7:0] rise_edge,
     input logic [7:0] fall_edge,
-    input logic [7:0] misc,
+    input misc_t misc,
     input cfg_word_t cfg,
 
     output logic [ACTION_W-1:0] action;
