@@ -1,36 +1,34 @@
-module rx_fsm (
+module fsm import fsm_ctrl_pkg::*; (
     input logic clk,
-    input logic rx_en,
-    input logic rst_n,
+    input logic rst,
+    input logic en,
 
     input logic [7:0] uio_in,               // input pads
-    input logic [7:0] condition_steady,     // target steady state pad values, fetched from mem with fsm state
-    input logic [7:0] condition_r_edge,       // target rising edge transition, fetched from mem with fsm state
-    input logic [7:0] condition_f_edge,       // target falling edge transition, fetched from mem with fsm state
-    input logic [7:0] condition_mask,            // which bits are of interest (~uio_oe unless out bits matter), fetched from mem with fsm state
-    input logic [7:0] truth_table,          // LUT3 table
+    input logic [7:0] rise_edge,
+    input logic [7:0] fall_edge,
+    input logic [7:0] misc,
+    input cfg_word_t cfg,
 
-    output logic [4:0] state,              // 32 states
-    output logic [15:0] count,
-    output logic [15:0] timer
+    output logic [ACTION_W-1:0] action;
 );
 
-logic [7:0] uio_in_prev;  // last sampled pad state
-logic uio_in_prev_valid;  // initial settling on startup doesn't count
-logic [7:0] rise, fall;   // rising edge, falling edge detection
-assign rise = uio_in_prev_valid ? (uio_in & ~uio_in_prev) : 8'b0;
-assign fall = uio_in_prev_valid ? (~uio_in & uio_in_prev) : 8'b0;
+logic [31:0] signals;
+assign signals = {uio_in, rise_edge, fall_edge, misc};
 
-always_ff (posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
-        uio_in_prev <= 8'b0;
-        uio_in_prev_valid <= 1'b0;
-    end else begin
-        uio_in_prev <= uio_in;
-        uio_in_prev_valid <= 1'b1;
-    end
+logic lut1_sel1 = signals[cfg.lut1_addr[0]];
+logic lut1_sel2 = signals[cfg.lut1_addr[1]];
+logic lut1_sel3 = signals[cfg.lut1_addr[2]];
+
+logic lut2_sel1 = signals[cfg.lut2_addr[0]];
+logic lut2_sel2 = signals[cfg.lut2_addr[1]];
+logic lut2_sel3 = signals[cfg.lut2_addr[2]];
+
+if (cfg.lut1_truth[{lut1_sel3, lut1_sel2, lut1_sel1}]) begin
+    action = cfg.action[0];
+end else if (cfg.lut2_truth[{lut2_sel3, lut2_sel2, lut2_sel1}]) begin
+    action = cfg.action[1];
+end else begin
+    action = cfg.action[2];
 end
-
-// FSM logic goes here
 
 endmodule
