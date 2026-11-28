@@ -3,6 +3,12 @@
 For standalone RX/TX datapath tests and their GTKWave commands, see
 [datapath/README.md](datapath/README.md).
 
+For the FSM's two IHP SRAM macros, run `make -f sram_test.mk` from this
+directory, or `make -f sram_test.mk synth_test` for a post-synthesis check.
+These standalone tests need Icarus Verilog (and Yosys for synthesis), without
+cocotb or a PDK install. See [the SRAM notes](../src/sram/README.md) for the
+memory interface, placements, and remaining top-level/P&R work.
+
 This is a sample testbench for a Tiny Tapeout project. It uses [cocotb](https://docs.cocotb.org/en/stable/) to drive the DUT and check the outputs.
 See below to get started or for more information, check the [website](https://tinytapeout.com/hdl/testing/).
 
