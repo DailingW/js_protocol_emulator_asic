@@ -1,0 +1,23 @@
+[timestart] 0
+[size] 1400 800
+[treeopen] tb_rx_serializer.
+[treeopen] tb_rx_serializer.dut.
+[signals_width] 300
+@28
+tb_rx_serializer.clk
+tb_rx_serializer.rst_n
+tb_rx_serializer.rx_en
+@22
+tb_rx_serializer.rx_width[2:0]
+tb_rx_serializer.index_map_flat[23:0]
+tb_rx_serializer.uio_in[7:0]
+@28
+tb_rx_serializer.rx_in_stream_valid
+tb_rx_serializer.rx_in_stream_ready
+tb_rx_serializer.rx_out_stream_valid
+tb_rx_serializer.rx_out_stream_ready
+tb_rx_serializer.rx_out_stream
+tb_rx_serializer.dut.busy
+@22
+tb_rx_serializer.dut.index_map_lane[2:0]
+tb_rx_serializer.dut.rx_buf[7:0]

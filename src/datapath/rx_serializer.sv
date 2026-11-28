@@ -8,8 +8,8 @@ module rx_serializer (
     input logic rx_in_stream_valid,         // incoming data on pads is valid
     input logic rx_out_stream_ready,          // ready to transfer data out of buf to downstream FIFO
 
-    output logic rx_in_stream_ready,        // ready to accept new data from pads
     output logic rx_out_stream,             // serialized bit stream
+    output logic rx_in_stream_ready,        // ready to accept new data from pads
     output logic rx_out_stream_valid        // bit is real data
 );
 
@@ -18,10 +18,10 @@ logic [2:0] index_map_lane;
 logic busy, load, index_map_last_lane;
 
 assign index_map_last_lane = (index_map_lane == rx_width);
-assign load = !busy || (rx_out_stream_ready && index_map_last_lane);  
-assign rx_in_stream_ready = rx_en && load;
+assign load = rx_en && (!busy || (rx_out_stream_ready && index_map_last_lane));
 
 assign rx_out_stream_valid = rx_en && busy;
+assign rx_in_stream_ready = rx_en && load;      // diagnostic signal, unused
 assign rx_out_stream = rx_buf[rx_index_map[index_map_lane]];
 
 // Data stream (serialize if parallel)
@@ -31,19 +31,18 @@ always_ff @(posedge clk or negedge rst_n) begin
         rx_buf <= 8'b0;
         busy <= 1'b0;
         index_map_lane <= 3'b0;
-    end else if (!rx_en) begin
-        busy <= 1'b0;
-        index_map_lane <= 3'd0;
-    end else if (load) begin
-        // update the buf if new data is available and not busy with current snapshot
-        index_map_lane <= 3'b0;
-        busy <= rx_in_stream_valid;
-        if (rx_in_stream_valid) begin
-            rx_buf <= uio_in;
+    end else if (rx_en) begin
+        if (load) begin
+            // update the buf if new data is available and not busy with current snapshot
+            index_map_lane <= 3'b0;
+            busy <= rx_in_stream_valid;
+            if (rx_in_stream_valid) begin
+                rx_buf <= uio_in;
+            end
+        end else if (rx_out_stream_ready) begin
+            // LSB to MSB or MSB to LSB depending on how rx_index_map is set
+            index_map_lane <= index_map_lane + 3'b1;
         end
-    end else if (rx_out_stream_ready) begin
-        // LSB to MSB or MSB to LSB depending on how rx_index_map is set
-        index_map_lane <= index_map_lane + 3'b1;
     end
 end
 

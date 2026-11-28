@@ -95,6 +95,8 @@ package fsm_ctrl_pkg;
 localparam int unsigned COND_SEL_W       = 5;
 localparam int unsigned ACTION_W         = 23;
 localparam int unsigned BRANCH_COUNT     = 3;
+localparam int unsigned STATE_W         = 6;
+typedef logic [STATE_W-1:0] state_t;
 
 // [RX/TX] Cycle counter controls
 typedef enum logic [1:0] {
@@ -191,7 +193,7 @@ typedef struct packed {
     state_t                     jump_target1;
     state_t                     jump_target2;
     logic                       default_advance;
-    logic [ACTION_W-1:0][BRANCH_COUNT-1:0] action;
+    logic [BRANCH_COUNT-1:0][ACTION_W-1:0] action;
 } cfg_word;
 
 typedef cfg_word cfg_word_t;  // Preserve the original name and a _t alias.

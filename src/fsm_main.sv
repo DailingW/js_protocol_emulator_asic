@@ -13,12 +13,13 @@ module fsm_main (
 );
 
 // SRAM memory
-// - State memory for the FSM 2x 64x64 per FSM, 4 total
+// - State memory for the FSM 2x 64x64 per FSM, 4 total (RX and TX FSM)
 // Flip Flop CSRs (?)
 // - Bit order map 8x 3b per FSM, 48b total
 // - Counter 4x 16b per FSM, 128b total
 // - Counter limit 4x 16b per FSM, 128b total
 // - (optional) Counter alternate limits 4x 16b per counter limit, 256b total
+// - flags, 2b per FSM, 4b total
 // - RX pattern match registers 4x 32b, 128b total
 // - State counter 6b per FSM, 12b total
 

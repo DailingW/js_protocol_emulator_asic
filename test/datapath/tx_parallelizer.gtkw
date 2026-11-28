@@ -1,0 +1,26 @@
+[timestart] 0
+[size] 1400 800
+[treeopen] tb_tx_parallelizer.
+[treeopen] tb_tx_parallelizer.dut.
+[signals_width] 300
+@28
+tb_tx_parallelizer.clk
+tb_tx_parallelizer.rst_n
+tb_tx_parallelizer.tx_en
+@22
+tb_tx_parallelizer.tx_width[2:0]
+tb_tx_parallelizer.index_map_flat[23:0]
+@28
+tb_tx_parallelizer.tx_in_stream
+tb_tx_parallelizer.tx_in_stream_valid
+tb_tx_parallelizer.tx_in_stream_ready
+tb_tx_parallelizer.tx_out_stream_valid
+tb_tx_parallelizer.tx_out_stream_ready
+@22
+tb_tx_parallelizer.uio_out[7:0]
+tb_tx_parallelizer.uio_oe[7:0]
+@28
+tb_tx_parallelizer.dut.busy
+@22
+tb_tx_parallelizer.dut.index_map_lane[2:0]
+tb_tx_parallelizer.dut.tx_buf[7:0]
